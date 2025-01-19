@@ -9,16 +9,30 @@ export const GlobalProvider = ({ children }) => {
   const [incomes, setIncomes] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [budgetAllocations, setBudgetAllocations] = useState([]);
-  const [allTotalIncome, setTotalIncome] = useState(0);
+  const [allTotalIncome, setTotalIncome] = useState(0); // Server-fetched total income
   const [error, setError] = useState(null);
+
+  // Calculate total income dynamically from the local state
+  const calculateTotalIncome = () =>
+    incomes.reduce((total, income) => total + (income.amount || 0), 0);
+
+  // Define totalIncome as a function for flexibility
+  const totalIncome = () => allTotalIncome || calculateTotalIncome();
+
+  // Helper function for error handling
+  const handleError = (err, defaultMessage) => {
+    const message = err?.response?.data?.message || defaultMessage;
+    setError(message);
+    console.error(message);
+  };
 
   // Add income
   const addIncome = async (income) => {
     try {
       await axios.post(`${BASE_URL}add-income`, income);
-      getIncomes();
+      await getIncomes();
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to add income");
+      handleError(err, "Failed to add income");
     }
   };
 
@@ -26,9 +40,9 @@ export const GlobalProvider = ({ children }) => {
   const getIncomes = async () => {
     try {
       const response = await axios.get(`${BASE_URL}get-incomes`);
-      setIncomes(response.data);
+      setIncomes(response.data || []);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch incomes");
+      handleError(err, "Failed to fetch incomes");
     }
   };
 
@@ -36,22 +50,19 @@ export const GlobalProvider = ({ children }) => {
   const deleteIncome = async (id) => {
     try {
       await axios.delete(`${BASE_URL}delete-income/${id}`);
-      getIncomes();
+      await getIncomes();
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to delete income");
+      handleError(err, "Failed to delete income");
     }
   };
-
-  // Calculate total income
-  const totalIncome = () => incomes.reduce((total, income) => total + income.amount, 0);
 
   // Add expense
   const addExpense = async (expense) => {
     try {
       await axios.post(`${BASE_URL}add-expense`, expense);
-      getExpenses();
+      await getExpenses();
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to add expense");
+      handleError(err, "Failed to add expense");
     }
   };
 
@@ -59,9 +70,9 @@ export const GlobalProvider = ({ children }) => {
   const getExpenses = async () => {
     try {
       const response = await axios.get(`${BASE_URL}get-expenses`);
-      setExpenses(response.data);
+      setExpenses(response.data || []);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch expenses");
+      handleError(err, "Failed to fetch expenses");
     }
   };
 
@@ -69,14 +80,15 @@ export const GlobalProvider = ({ children }) => {
   const deleteExpense = async (id) => {
     try {
       await axios.delete(`${BASE_URL}delete-expense/${id}`);
-      getExpenses();
+      await getExpenses();
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to delete expense");
+      handleError(err, "Failed to delete expense");
     }
   };
 
   // Calculate total expenses
-  const totalExpenses = () => expenses.reduce((total, expense) => total + expense.amount, 0);
+  const totalExpenses = () =>
+    expenses.reduce((total, expense) => total + (expense.amount || 0), 0);
 
   // Calculate total balance
   const totalBalance = () => totalIncome() - totalExpenses();
@@ -84,26 +96,32 @@ export const GlobalProvider = ({ children }) => {
   // Get recent transaction history
   const transactionHistory = () => {
     const history = [...incomes, ...expenses];
-    return history.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
+    return history
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 3);
   };
 
-  // Fetch total income
+  // Fetch total income from server
   const fetchTotalIncome = async () => {
     try {
       const response = await axios.get(`${BASE_URL}total-income`);
-      setTotalIncome(response.data.allTotalIncome);
+      setTotalIncome(response.data.allTotalIncome || 0);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch total income");
+      handleError(err, "Failed to fetch total income");
     }
   };
 
-  // Add budget category
-  const addBudgetCategory = async (category, amount) => {
+  // Add budget category with date
+  const addBudgetCategory = async (category, amount, date) => {
     try {
-      const response = await axios.post(`${BASE_URL}add-budget-category`, { category, amount });
-      setBudgetAllocations(response.data.budgetAllocations);
+      const response = await axios.post(`${BASE_URL}add-budget-category`, {
+        category,
+        amount,
+        date,
+      });
+      setBudgetAllocations(response.data.budgetAllocations || []);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to add budget category");
+      handleError(err, "Failed to add budget category");
     }
   };
 
@@ -111,13 +129,14 @@ export const GlobalProvider = ({ children }) => {
   const fetchBudgetSummary = async () => {
     try {
       const response = await axios.get(`${BASE_URL}budget-summary`);
-      setTotalIncome(response.data.totalIncome);
-      setBudgetAllocations(response.data.budgetAllocations);
+      setTotalIncome(response.data.totalIncome || 0);
+      setBudgetAllocations(response.data.budgetAllocations || []);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch budget summary");
+      handleError(err, "Failed to fetch budget summary");
     }
   };
 
+  // Provide context values
   return (
     <GlobalContext.Provider
       value={{
@@ -125,8 +144,10 @@ export const GlobalProvider = ({ children }) => {
         getIncomes,
         incomes,
         deleteIncome,
+        totalIncome, // Now correctly defined
         expenses,
-        totalIncome,
+        allTotalIncome, // Server-fetched total income
+        calculateTotalIncome, // Function for calculation
         addExpense,
         getExpenses,
         deleteExpense,
@@ -134,7 +155,8 @@ export const GlobalProvider = ({ children }) => {
         totalBalance,
         transactionHistory,
         fetchTotalIncome,
-        addBudgetCategory,
+        budgetAllocations,
+        addBudgetCategory, // Updated to handle category with date
         fetchBudgetSummary,
         error,
         setError,

@@ -7,7 +7,7 @@ import { dollar } from '../../utils/Icons';
 import Chart from '../Chart/Chart';
 
 function Dashboard() {
-    const { totalExpenses, incomes, expenses, totalIncome, totalBalance, getIncomes, getExpenses } = useGlobalContext();
+    const { totalExpenses, incomes, expenses, totalIncome, totalBalance, getIncomes, getExpenses, allTotalIncome, calculateTotalIncome, error } = useGlobalContext();
 
     useEffect(() => {
         getIncomes();
@@ -40,6 +40,12 @@ function Dashboard() {
                                     {dollar} {totalBalance()}
                                 </p>
                             </div>
+                            <div>
+                                <h1>Dashboard</h1>
+                                {error && <p style={{ color: "red" }}>{error}</p>}
+                                <p>Fetched Total Income: ${allTotalIncome}</p>
+                                <p>Calculated Total Income: ${calculateTotalIncome()}</p>
+                            </div>
                         </div>
                     </div>
                     <div className="history-con">
@@ -47,19 +53,19 @@ function Dashboard() {
                         <h2 className="amount-title">Details on Account</h2>
                         <div className="amount-item">
                             <p>
-                                {incomes.find(item => item.amount === Math.min(...incomes.map(item => item.amount)))?.title || 'Unknown'}:${Math.min(...incomes.map(item => item.amount))} 
+                                {incomes.find(item => item.amount === Math.min(...incomes.map(item => item.amount)))?.title || 'Unknown'}:${Math.min(...incomes.map(item => item.amount))}
                             </p>
                             <p>
-                            {incomes.find(item => item.amount === Math.max(...incomes.map(item => item.amount)))?.title || 'Unknown'}: ${Math.max(...incomes.map(item => item.amount))} 
+                                {incomes.find(item => item.amount === Math.max(...incomes.map(item => item.amount)))?.title || 'Unknown'}: ${Math.max(...incomes.map(item => item.amount))}
                             </p>
                         </div>
                         <h2 className="amount-title">All Expenses According to Account</h2>
                         <div className="amount-item">
                             <p>
-                            from {expenses.find(item => item.amount === Math.min(...expenses.map(item => item.amount)))?.title || 'Unknown'}: ${Math.min(...expenses.map(item => item.amount))} 
+                                from {expenses.find(item => item.amount === Math.min(...expenses.map(item => item.amount)))?.title || 'Unknown'}: ${Math.min(...expenses.map(item => item.amount))}
                             </p>
                             <p>
-                            from {expenses.find(item => item.amount === Math.max(...expenses.map(item => item.amount)))?.title || 'Unknown'}: ${Math.max(...expenses.map(item => item.amount))} 
+                                from {expenses.find(item => item.amount === Math.max(...expenses.map(item => item.amount)))?.title || 'Unknown'}: ${Math.max(...expenses.map(item => item.amount))}
                             </p>
                         </div>
                     </div>
