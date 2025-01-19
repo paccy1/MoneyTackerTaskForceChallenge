@@ -47,7 +47,7 @@ React: Provides a dynamic and responsive user interface.
 How to access the application?
 -----------------------------------
 
-To access the application go to: https://fluffy-trifle-616728.netlify.app/
+To access the application go to: https://frabjous-banoffee-4110d9.netlify.app/
 I encountered challenges during the deployment process, so the latest deployment has not been generated yet. As a result, the most recent version of my work is not currently available. However, you can still run the code locally to review my progress. The necessary credentials are provided in the file named dotEnvExample.
 
 
