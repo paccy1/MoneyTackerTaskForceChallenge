@@ -52,61 +52,34 @@ function Budget() {
 }
 
 const BudgetStyled = styled.div`
-  .total-income {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    span {
-      font-weight: bold;
-    }
-  }
-
-  .budget-content {
-    display: flex;
-    gap: 2rem;
-
-    .form-container {
-      flex: 1;
-    }
-
-    .budget-summary {
-      flex: 1;
-      padding: 1rem;
-      background: #f9f9f9;
-      border-radius: 10px;
-      box-shadow: 0px 1px 10px rgba(0, 0, 0, 0.05);
-
-      h2 {
-        margin-bottom: 1rem;
-      }
-
-      ul {
-        list-style: none;
-        padding: 0;
-        li {
-          padding: 0.5rem 0;
-          display: flex;
-          justify-content: space-between;
-
-          button {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 0.25rem 0.5rem;
-            border-radius: 5px;
-            cursor: pointer;
-          }
+display: flex;
+    overflow: auto;
+    .total-income{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #FCF6F9;
+        border: 2px solid #FFFFFF;
+        box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
+        border-radius: 20px;
+        padding: 1rem;
+        margin: 1rem 0;
+        font-size: 2rem;
+        gap: .5rem;
+        span{
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--color-green);
         }
-      }
-
-      .warning {
-        color: #dc3545;
-      }
-
-      .success {
-        color: #28a745;
-      }
     }
-  }
+    .income-content{
+        display: flex;
+        gap: 2rem;
+        .incomes{
+            flex: 1;
+        }
+    }
 `;
+  
 
 export default Budget;
