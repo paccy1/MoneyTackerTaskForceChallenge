@@ -9,6 +9,8 @@ import Income from './Components/Income/Income'
 import Expenses from './Components/Expenses/Expenses';
 import Budget from './Components/Budget/Budget';
 import { useGlobalContext } from './context/globalContext';
+// import dotenv from 'dotenv';
+// dotenv.config();
 
 function App() {
   const [active, setActive] = useState(1)

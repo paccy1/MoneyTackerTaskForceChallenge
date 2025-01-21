@@ -14,9 +14,9 @@ const Budget = () => {
     error,
   } = useGlobalContext();
 
-  const [category, setCategory] = useState(""); // Single category selection
+  const [category, setCategory] = useState("");
   const [amount, setAmount] = useState("");
-  const [date, setDate] = useState(new Date()); // Default to the current date
+  const [date, setDate] = useState(new Date());
 
   useEffect(() => {
     fetchTotalIncome();
@@ -25,9 +25,7 @@ const Budget = () => {
 
   const handleAddCategory = async (e) => {
     e.preventDefault();
-
     if (category && amount && date) {
-      // Add the selected category to the backend
       await addBudgetCategory(category, amount, date.toISOString().split("T")[0]);
       setCategory("");
       setAmount("");
@@ -35,11 +33,7 @@ const Budget = () => {
     }
   };
 
-  // Calculate the total allocated budget
-  const totalAllocated = budgetAllocations.reduce(
-    (sum, allocation) => sum + allocation.amount,
-    0
-  );
+  const totalAllocated = budgetAllocations.reduce((sum, allocation) => sum + allocation.amount, 0);
 
   return (
     <Container>
@@ -47,16 +41,9 @@ const Budget = () => {
       {error && <ErrorMessage>{error}</ErrorMessage>}
       <TotalIncome>Total Income: ${totalIncome()}</TotalIncome>
       <TotalAllocated>Total Allocated: ${totalAllocated}</TotalAllocated>
-
       <Form onSubmit={handleAddCategory}>
-        <Select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          required
-        >
-          <option value="" disabled>
-            Select a category
-          </option>
+        <Select value={category} onChange={(e) => setCategory(e.target.value)} required>
+          <option value="" disabled>Select a category</option>
           <option value="Rent">Rent</option>
           <option value="Clothes">Clothes</option>
           <option value="Transport">Transport</option>
@@ -74,12 +61,12 @@ const Budget = () => {
             selected={date}
             onChange={(selectedDate) => setDate(selectedDate)}
             dateFormat="yyyy-MM-dd"
+            placeholderText="yyyy-mm-dd"
             required
           />
         </DatePickerWrapper>
         <Button type="submit">Add Category</Button>
       </Form>
-
       <SectionTitle>Budget Allocations</SectionTitle>
       {budgetAllocations.length > 0 ? (
         <Table>

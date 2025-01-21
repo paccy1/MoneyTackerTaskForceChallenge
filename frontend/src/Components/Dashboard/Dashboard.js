@@ -7,17 +7,37 @@ import { dollar } from '../../utils/Icons';
 import Chart from '../Chart/Chart';
 
 function Dashboard() {
-    const { totalExpenses, incomes, expenses, totalIncome, totalBalance, getIncomes, getExpenses, allTotalIncome, calculateTotalIncome, error } = useGlobalContext();
+    const {
+        totalExpenses,
+        totalIncome,
+        totalBalance,
+        getIncomes,
+        getExpenses,
+        incomes,
+        expenses,
+        allTotalIncome,
+        calculateTotalIncome,
+        fetchBudgetSummary,
+        budgetAllocations,
+        error
+    } = useGlobalContext();
 
     useEffect(() => {
         getIncomes();
         getExpenses();
+        fetchBudgetSummary();
     }, []);
+
+    // Calculate total allocated budget
+    const totalAllocated = budgetAllocations.reduce(
+        (sum, allocation) => sum + allocation.amount,
+        0
+    );
 
     return (
         <DashboardStyled>
             <InnerLayout>
-                <h1>All Transactions</h1>
+                <h1>Budget Report</h1>
                 <div className="stats-con">
                     <div className="chart-con">
                         <Chart />
@@ -40,11 +60,11 @@ function Dashboard() {
                                     {dollar} {totalBalance()}
                                 </p>
                             </div>
-                            <div>
-                                <h1>Dashboard</h1>
-                                {error && <p style={{ color: "red" }}>{error}</p>}
-                                <p>Fetched Total Income: ${allTotalIncome}</p>
-                                <p>Calculated Total Income: ${calculateTotalIncome()}</p>
+                            <div className="budget">
+                                <h2>Total Allocated Budget</h2>
+                                <p>
+                                    {dollar} {totalAllocated}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -53,7 +73,7 @@ function Dashboard() {
                         <h2 className="amount-title">Details on Account</h2>
                         <div className="amount-item">
                             <p>
-                                {incomes.find(item => item.amount === Math.min(...incomes.map(item => item.amount)))?.title || 'Unknown'}:${Math.min(...incomes.map(item => item.amount))}
+                                {incomes.find(item => item.amount === Math.min(...incomes.map(item => item.amount)))?.title || 'Unknown'}: ${Math.min(...incomes.map(item => item.amount))}
                             </p>
                             <p>
                                 {incomes.find(item => item.amount === Math.max(...incomes.map(item => item.amount)))?.title || 'Unknown'}: ${Math.max(...incomes.map(item => item.amount))}
@@ -88,10 +108,7 @@ const DashboardStyled = styled.div`
                 grid-template-columns: repeat(4, 1fr);
                 gap: 2rem;
                 margin-top: 2rem;
-                .income, .expense {
-                    grid-column: span 2;
-                }
-                .income, .expense, .balance {
+                .income, .expense, .balance, .budget {
                     background: #FCF6F9;
                     border: 2px solid #FFFFFF;
                     box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
